@@ -1,0 +1,531 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- This template is for creating an Internet Draft using xml2rfc,
+     which is available here: http://xml.resource.org. -->
+<!DOCTYPE rfc SYSTEM "rfc2629.dtd" [
+<!-- One method to get references from the online citation libraries.
+     There has to be one entity for each item to be referenced. 
+     An alternate method (rfc include) is described in the references. -->
+
+<!ENTITY RFC2629 SYSTEM "http://xml.resource.org/public/rfc/bibxml/reference.RFC.2629.xml">
+]>
+<?xml-stylesheet type='text/xsl' href='rfc2629.xslt' ?>
+<!-- used by XSLT processors -->
+<!-- For a complete list and description of processing instructions (PIs), 
+     please see http://xml.resource.org/authoring/README.html. -->
+<!-- Below are generally applicable Processing Instructions (PIs) that most I-Ds might want to use.
+     (Here they are set differently than their defaults in xml2rfc v1.32) -->
+<?rfc strict="yes" ?>
+<!-- give errors regarding ID-nits and DTD validation -->
+<!-- control the table of contents (ToC) -->
+<?rfc toc="yes"?>
+<!-- generate a ToC -->
+<?rfc tocdepth="4"?>
+<!-- the number of levels of subsections in ToC. default: 3 -->
+<!-- control references -->
+<?rfc symrefs="yes"?>
+<!-- use symbolic references tags, i.e, [RFC2119] instead of [1] -->
+<?rfc sortrefs="yes" ?>
+<!-- sort the reference entries alphabetically -->
+<!-- control vertical white space 
+     (using these PIs as follows is recommended by the RFC Editor) -->
+<?rfc compact="yes" ?>
+<!-- do not start each main section on a new page -->
+<?rfc subcompact="no" ?>
+<!-- do not display copyright and other IETF-related stuff -->
+<?rfc private="(c) GROUP XXXX, 2013" ?>
+
+<rfc category="info" docName="draft-spec-r328-s17-g25" ipr="trust200902">
+  <!-- category values: std, bcp, info, exp, and historic
+     ipr values: full3667, noModification3667, noDerivatives3667
+     you can add the attributes updates="NNNN" and obsoletes="NNNN" 
+     they will automatically be output with "(if approved)" -->
+
+  <!-- ***** FRONT MATTER ***** -->
+
+  <front>
+    <!-- The abbreviated title is used in the page header - it is only necessary if the 
+         full title is longer than 39 characters -->
+
+    <title abbrev="Specification du protocole">Group 25: c2w protocol specification proposal
+    </title>
+
+    <!-- add 'role="editor"' below for the editors if appropriate -->
+
+    
+    <author fullname="AUFFRAY--PLESSIX Anne-Sibylle" initials="A.S"
+            surname="AUFFRAY--PLESSIX">
+      <organization>Telecom Bretagne</organization>
+
+      <address>
+                
+
+        <email>as.auffray--plessix@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+
+    <author fullname="DIEYE Souleymane" initials="S"
+            surname="DIEYE">
+      <organization>Telecom Bretagne</organization>
+
+      <address>
+                
+
+        <email>souleymane.dieye@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    
+
+    <author fullname="LESAGE Vincent" initials="V"
+            surname="LESAGE">
+      <organization>Telecom Bretagne</organization>
+
+      <address>
+        
+        
+
+        <email>vincent.lesage@telecom-bretagne.eu</email>
+       
+        
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+
+    <author fullname="TOBITT Eric" initials="E"
+            surname="TOBITT">
+      <organization>Telecom Bretagne</organization>
+
+      <address>
+                
+
+        <email>eric.tobitt@telecom-bretagne.eu</email>
+
+        <!-- uri and facsimile elements may also be added -->
+      </address>
+    </author>
+    
+    
+
+
+    <date month="april" year="2017" />
+
+    <!-- If the month and year are both specified and are the current ones, xml2rfc will fill 
+         in the current day for you. If only the current year is specified, xml2rfc will fill 
+	 in the current day and month for you. If the year is not the current one, it is 
+	 necessary to specify at least a month (xml2rfc assumes day="1" if not specified for the 
+	 purpose of calculating the expiry date).  With drafts it is normally sufficient to 
+	 specify just the year. -->
+
+    <keyword>c2w</keyword>
+
+    <!-- Keywords will be incorporated into HTML output
+         files in a meta tag but they have no effect on text or nroff
+         output. If you submit your draft to the RFC Editor, the
+         keywords will be used for the search engine. -->
+
+    <abstract>
+      <t>L'application Chat While Watching (c2w) permet a un utilisateur de dicuter avec d'autres utilisateurs regardant le meme film que lui.
+        Le protocol de l'application permet la communication entre un client (l'utilisateur) et un serveur. Ce service de chat permet la gestion de plusieurs salons
+        de discussion (la salle principale et les salles de film) et l'envoi ou reception de messages. </t>
+    <t>Ce document présente la spécification (pour la version binaire) du protocol de l'application c2w. </t>
+
+    </abstract>
+  </front>
+
+  <middle>
+    <section title="Introduction">
+
+    <t>L'application c2w permet a un utilisateur de discuter avec des personnes regardant le meme film que lui. Le protocol doit permettre d'envoyer et de recevoir des
+    messages entre les différents utilisateurs présents dans la meme salle. Il doit aussi assurer la connexion et la deconnexion d'un utilisateur.
+    Il permet à un utilisateur de choisir un film parmi une liste referencee sur le serveur. </t>
+    <t> Chaque client doit connaitre le nom 
+        (ou l'adresse IP) ainsi que le numero de port du serveur auquel il souhaite se connecter. Il doit egalement choisir un identifiant, compose au 
+        maximum de seize caracteres.</t> 
+
+    <t> Ce document présente donc l'ensemble des specifications du protocol ainsi qu'un exemple de scenario afin de l'illustrer.</t>
+
+
+    </section>
+
+
+    <section title="Format principal des messages">
+
+    <t>Tous les messages ont le meme format. Le format est decrit ci-dessous : </t>
+
+    <t>
+    <figure align="center" anchor="sample_pkt">
+    <artwork>
+    0                  10                  20                  30  
+    0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                            heure                              |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                                                               |
+    |                    Identifiant                                | 
+    |                                                               |  
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+                                                               
+    |Num de Sequence|     Type      |          Taille message       |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+    |                          Message                              |   
+    .                                                               .
+    .                                                               .
+    |                                                               |
+    +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+        </artwork></figure></t>
+
+
+
+    <t> Champ Heure (4 octets)</t>
+    <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+            Ce champ contient le nombre de seconde depuis le premier janvier 1970. Pour les reponses, c'est-a-dire les messages du serveur vers
+    le client, le champ Heure doit etre le meme que le champ heure correspondant a la requete du client.
+			
+		</t>
+    </list></t>
+
+   
+
+    <t>Champ Identifiant (16 octets)</t>
+    <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+            Pour un message du client vers le serveur, ce champ contient l'identifiant choisi par l'utilisateur. Sa taille maximale est de 16 caracteres, codes en ASCII.
+             Si l'identifiant comprend moins de 16 caracteres, les octets non utilises prennent automatiquement la valeur de zero.
+            Pour un message du serveur vers le client, ce contient l'adresse IP du serveur.  
+		</t>
+    </list></t>
+
+   
+    <t>Champ Numéro de Sequence (1 octet)</t>
+        <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+             Ce champ permet d'assurer la fiabilite du protocole. Ceci permet de s'assurer que tout le message a bien ete envoye.
+            Le principe de fonctionnement est decrit dans la partie 7, intitulee Fiabilite.
+			
+		</t>
+    </list></t>
+
+    
+
+    <t>Champ Type (1 octet)</t>
+
+        <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+             Ce champ precise le type de message et permet donc d'avoir tout les messages au meme format.
+			
+		</t>
+    </list></t>
+
+   
+
+     <t>
+    	<list style="hanging" hangIndent="20" >
+    		<t hangText=" ">
+			Requete de connexion  00000001
+		</t>
+		<t hangText=" ">
+			Succes de connexion   00000010
+		</t>
+            <t hangText=" ">
+                Echec de connexion    00000100
+            </t>
+
+        <t hangText=" ">
+			Liste utilisateurs       00001000
+		</t>
+
+        <t hangText=" ">
+			Liste films              00010000
+		</t>       
+
+        <t hangText=" ">
+			Requete_Chat             00100000
+		</t>
+        <t hangText=" ">
+			Reponse_Chat             01000000
+		</t>
+
+        <t hangText=" ">
+			Deconnexion              10000000
+		</t>
+
+        <t hangText=" ">
+			Acquittement             00000011
+		</t>
+
+        <t hangText=" ">
+			Choix film               00000101
+		</t>
+
+
+    	</list>
+        </t>
+
+    <t>Champ Taille message (4 octets) </t>
+
+        <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+             Ce champ indique la taille du champ Message en bits. (assure la fiabilte en TCP)
+			
+		</t>
+    </list></t>
+
+  
+    <t> Champ Message (taille variable) </t>
+
+        <t>
+    <list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+             Le message transmis en code en ASCII.
+			
+		</t>
+    </list></t>
+ 
+
+            
+
+            
+    </section>
+
+
+    <section title="Login">
+    <t>
+    L'utilisateur doit tout d'abord se connecter a la plateforme. Pour cela, il envoie une requete de connexion 
+    au serveur contenant son
+    identifiant, l'adresse IP et le numero de port du serveur auquel il souhaite se connecter. </t>
+
+    <t>Pour chaque client, le serveur doit conserver les informations suivantes dans une variable : adresse IP, numero de port, identifiant et localisation. 
+    La localisation du client se traduit par l'adresse IP de la Main Room ou l'adresse IP correspondant au film visionné par le client.</t>
+
+    <t>Le serveur envoie une confirmation de login au client ou un message d'echec en cas d'erreur de connexion. La connexion peut echouer
+    pour plusieurs raisons : l'identifiant choisi est trop long ou il a deja ete choisi par un autre utilisateur ; l'adresse IP ou le port 
+    entre est invalide.</t>
+
+    <t> Pour chaque situation, le champ Type prend les valeurs suivantes : </t> 
+
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+			Requete de connexion  00000001
+		</t>
+		<t hangText=" ">
+			Succes de connexion   00000010
+		</t>
+            <t hangText=" ">
+                Echec de connexion    00000100
+            </t>
+    	</list>
+    </t>
+
+
+
+
+    <t> Le contenu du champ Message doit preciser si la connexion est etablie et dans le cas contraire la nature de l'erreur. </t>
+    <t> Une fois la connexion etablie, une nouvelle fenetre Main Room s'ouvre. </t>
+      
+    
+    </section>
+
+
+    <section title="Main Room">
+     <t>expliquer comment on met a jour la liste d'utilisateur. </t>
+    </section>
+
+    <section title="Movie Room">
+    <t> L'utilisateur a la possibilite de discuter via une zone de chat avec les utilisateurs presents dans la meme salle.</t>
+ 
+    <t>
+        Lorsque l'utilsateur rentre dans la Movie Room (après la requete Choix Film decrite dans la partie ) precedente, l'information concernant sa localisation doit etre mise a jour.
+        Elle prend la valeur de l'adresse IP de la Movie Room correspondante.
+        La liste des utilisteurs de la Movie Room correspondante est mis a jour en ajoutant ce nouvel utilisateur. Cette liste doit etre mise a jour par le serveur d'un utilisateur entre ou sort 
+        de la Movie Room c'est-a-dire des que le serveur recoit une requete du type Choix film ou du type Deconnexion. 
+        A chaque mise a jour de la liste, la nouvelle liste est envoyée a tous les utilisateurs </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="Choix film">
+			  00000101
+		</t>
+		<t hangText="Deconnexion ">
+			10000000
+        </t>
+		
+    	</list>
+    </t>
+
+
+       <t>Le serveur doit envoyer la liste des utilisateurs presents dans la meme salle. Il envoie donc un message du type Liste utilisateurs.</t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="Type Liste utilisateur ">
+			00001000
+		</t>
+		
+    	</list>
+    </t>
+
+    <t> Lorsque l'utilisateur souhaite quitter sa Movie Room, il envoie une requete de deconnexion au serveur. Le message envoye est du type Deconnexion.</t>
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="Type Deconnexion ">
+			00000101
+		</t>
+		
+    	</list>
+    </t>   
+    
+    <t>Apres avoir recu l'acquittement de sa requete, l'utilisateur est redirige vers la fenetre Main Room, dont le fonctionnement a ete decrit
+    dans la partie precedente.  </t>
+    
+    <t> L'utilisateur a acces a une zone de chat ou il peut recevoir et envoyer des messages aux utilisateurs de la meme Movie Room.
+    Le protocol specifique au chat sera decrit dans la partie suivante, intiltulee Chat. </t>
+
+    </section>
+
+    <section title="Chat">
+    <t>Le chat de la Main Room et des Movies Room fonctionnent de la meme maniere. La seule difference est la liste d'utilisateurs. Dans la Movie Room, seuls les utilisateurs presents 
+    dans cette salle peuvent communiquer entre eux. </t>
+
+    <t>
+    Afin de discuter avec les gens presents dans la salle, l'utilisateur envoie un message de type Requete_chat au serveur.    
+    Le serveur recoit le message et envoie un acquittement a l'utilisateur et un message de type response_chat a tout les autres utilisateurs presents dans la salle.
+    Le serveur doit stocker la liste de tous les utilisateurs connectes ainsi que leur localisation. Connaissant la localisation de l'emetteur du message, il doit envoyer le message aux 
+    utilisateurs ayant la meme localisation </t>
+
+    <t>Les messages de type response_chat ne pouvant etre envoyés qu'a une seule personne, le serveur envoie donc autant de fois le message qu'il y a d'utilisateurs.</t>
+    <t> A l'ouverture du message par un utilisateur, un acquittement est envoyé au serveur pour signaler la bonne reception du message.</t>
+
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="Requete_chat">
+			  00100000
+		</t>
+		<t hangText="Response_chat ">
+			01000000
+        </t>
+        <t hangText="Acquittement">
+                00000011
+        </t>
+		
+    	</list>
+    </t>
+
+
+    </section>
+
+
+    <section title="Fiabilite">
+
+    <t>Lorsqu'un client utilise TCP, la fiabilite est assuree grace au champ Taille, indiquant la taille du message et permettant de savoir lorsque le message 
+    en entier a ete transmis.</t>
+
+
+    <t>Lorsque le client utilise UDP, la fiabilite est assuree grace au champ Numero de Sequence. Il permet de detecter les pertes de message et d'eviter les redondances.</t>
+    <t>Principe de Fonctionnement : </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="  ">
+			L'emetteur envoie un message, où le champ Numero de sequence vaut X. Par defaut, la valeur du Champ Numero de sequence du premier message envoyé vaut 0, et a
+    chaque nouveau message, cette valeur est incrementee.
+		</t>
+		
+    	</list>
+    </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+			Lorsque le recepteur recoit le message, il envoie un message du type Acquittement avec un Numero de Sequence valant X.
+		</t>
+    <t>
+    	<list style="hanging" hangIndent="20" >
+    		<t hangText=" ">
+			 Type Acquittement 00000011
+		</t>
+		
+    	</list>
+    </t>
+		
+    	</list>
+    </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+			Si l'emetteur de ne recoit rien dans un delais de 2 secondes, il renvoie le message de numero de sequence X.
+		</t>
+		
+    	</list>
+    </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText="  ">
+			S'il recoit l'acquittement, il envoie le message suivant en incrementant la valeur du champ Numero de sequence.
+		</t>
+		
+    	</list>
+    </t>
+
+    <t>
+    	<list style="hanging" hangIndent="10" >
+    		<t hangText=" ">
+			Si le recepteur recoit le message X en double, par exemple en cas de perte d'un acquittement, il ne considere pas la redondance et envoie un nouvel acquittement.
+		</t>
+		
+    	</list>
+    </t>
+
+    
+
+
+    
+
+    </section>
+     
+    <section title="Exemple de scenario">
+    <t> Dans cette partie, nous allons donner un exemple simple de cas d'utilisation, de la connexion et a la deconnexion d'un utilisateur. Cet utilisateur choisira un film, et recevra et enverra
+    des messages dans sa Movie Room. </t>
+    </section>
+
+    <section title="Conclusion">
+        <t>
+            Your conclusion goes here.
+        </t>
+    </section>
+   
+
+
+    <!-- Change Log
+
+v00 2006-03-15  EBD   Initial version
+
+v01 2006-04-03  EBD   Moved PI location back to position 1 -
+                      v3.1 of XMLmind is better with them at this location.
+v02 2007-03-07  AH    removed extraneous nested_list attribute,
+                      other minor corrections
+v03 2007-03-09  EBD   Added comments on null IANA sections and fixed heading capitalization.
+                      Modified comments around figure to reflect non-implementation of
+                      figure indent control.  Put in reference using anchor="DOMINATION".
+                      Fixed up the date specification comments to reflect current truth.
+v04 2007-03-09 AH     Major changes: shortened discussion of PIs,
+                      added discussion of rfc include.
+v05 2007-03-10 EBD    Added preamble to C program example to tell about ABNF and alternative 
+                      images. Removed meta-characters from comments (causes problems).  -->
+     </middle> 
+</rfc>
