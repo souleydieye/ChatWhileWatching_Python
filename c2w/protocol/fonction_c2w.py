@@ -1,9 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
-Created on Thu May  4 15:01:49 2017
 
-@author: asauffra
-"""
 
 #codage de l'entête du message
 #prend en argument le type du message, le numéro de séquence
